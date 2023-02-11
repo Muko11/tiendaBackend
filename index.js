@@ -6,8 +6,10 @@ const cors = require('cors');
 
 const app = express();
 
-const DB_URI = process.env.DB_URI || "mongodb://127.0.0.1:27017/tienda";
-const PORT = process.env.PORT || 5000;
+const DB_URI = process.env.DB_URI;
+// || "mongodb://127.0.0.1:27017/instituto"
+const PORT = process.env.PORT;
+//  || 3000
 
 mongoose.set('strictQuery', true);
 mongoose.connect(DB_URI)
@@ -17,16 +19,18 @@ mongoose.connect(DB_URI)
 app.use(express.static('public'));
 app.use(express.json());
 
-const Articulo = mongoose.model('Articulo', new mongoose.Schema(
+//Schema Alumno
+
+const Alumno = mongoose.model('Alumno', new mongoose.Schema(
     {
         nombre: { type: String, default: "Sin nombre" },
-        precio: { type: Number, default: 0 }
+        curso: { type: String, default: "No especificado" }
     }
 ));
 
 
-app.get("/api/articulos", cors(), (req, res) => {
-    Articulo.find(
+app.get("/api/alumnos", cors(), (req, res) => {
+    Alumno.find(
         {},
         (error, data) => {
             if (error) res.json(error);
@@ -36,8 +40,8 @@ app.get("/api/articulos", cors(), (req, res) => {
 })
 
 
-app.post("/api/articulos", cors(), (req, res) => {
-    new Articulo({ nombre: req.body.nombre, precio: req.body.precio })
+app.post("/api/alumnos", cors(), (req, res) => {
+    new Alumno({ nombre: req.body.nombre, curso: req.body.curso })
         .save(
             (error, data) => {
                 if (error) res.json(error);
@@ -47,8 +51,8 @@ app.post("/api/articulos", cors(), (req, res) => {
 
 
 
-app.delete("/api/articulos/:id", cors(), (req, res) => {
-    Articulo.findOneAndRemove(
+app.delete("/api/alumnos/:id", cors(), (req, res) => {
+    Alumno.findOneAndRemove(
         { _id: req.params.id },
         (error, data) => {
             if (error) res.json(error);
@@ -59,10 +63,53 @@ app.delete("/api/articulos/:id", cors(), (req, res) => {
 
 
 
-app.put("/api/articulos/:id", cors(), (req, res) => {
-    Articulo.findOneAndUpdate(
+app.put("/api/alumnos/:id", cors(), (req, res) => {
+    Alumno.findOneAndUpdate(
         { _id: req.params.id },
-        { $set: { nombre: req.body.nombre, precio: req.body.precio } },
+        { $set: { nombre: req.body.nombre, curso: req.body.curso } },
+        (error, data) => {
+            if (error) res.json(error);
+            else res.json(data)
+        }
+    )
+})
+
+
+//Schema Profesor
+
+const Profesor = mongoose.model('Profesor', new mongoose.Schema(
+    {
+        nombre: { type: String, default: "Sin nombre" },
+        asignatura: { type: String, default: "No especificado" }
+    }
+));
+
+
+app.get("/api/profesores", cors(), (req, res) => {
+    Profesor.find(
+        {},
+        (error, data) => {
+            if (error) res.json(error);
+            else res.json(data)
+        }
+    )
+})
+
+
+app.post("/api/profesores", cors(), (req, res) => {
+    new Profesor({ nombre: req.body.nombre, asignatura: req.body.asignatura })
+        .save(
+            (error, data) => {
+                if (error) res.json(error);
+                else res.json(data)
+            });
+})
+
+
+
+app.delete("/api/profesores/:id", cors(), (req, res) => {
+    Profesor.findOneAndRemove(
+        { _id: req.params.id },
         (error, data) => {
             if (error) res.json(error);
             else res.json(data)
@@ -72,42 +119,15 @@ app.put("/api/articulos/:id", cors(), (req, res) => {
 
 
 
+app.put("/api/profesores/:id", cors(), (req, res) => {
+    Profesor.findOneAndUpdate(
+        { _id: req.params.id },
+        { $set: { nombre: req.body.nombre, asignatura: req.body.asignatura } },
+        (error, data) => {
+            if (error) res.json(error);
+            else res.json(data)
+        }
+    )
+})
 
 app.listen(PORT, () => { console.log("Iniciado servidor web") });
-
-
-
-
-
-
-
-
-
-/* const articulos = [
-    { nombre: "Camisa", precio: 22 },
-    { nombre: "Botas", precio: 21 }
-];
-
-app.get("/api/articulos", (req, res) => {
-    res.json(articulos);
-});
-
-app.post("/api/articulos", (req, res) => {
-    articulos.push({
-        nombre: req.body.nombre, precio: req.body.precio
-    });
-    res.json(articulos);
-});
-
-app.delete("/api/articulos/:id", (req, res) => {
-    //articulos = articulos.filter((value, index) => index != req.params.id);
-    articulos.splice(req.params.id, 1);
-    res.json(articulos);
-});
-
-app.put("/api/articulos/:id", (req, res) => {
-    articulos[req.params.id] = req.body;
-    res.json(articulos);
-}); */
-
-
